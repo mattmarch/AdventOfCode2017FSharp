@@ -2,7 +2,7 @@
 
 let matchDay day = 
   match day with
-    | "1" -> Day1.solve
+    | "1" -> printfn "%A" Day1.solve
     | _ -> printfn "Input doesn't seem to match any days"
 
 
