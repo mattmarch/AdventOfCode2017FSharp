@@ -1,11 +1,20 @@
 module Day1
 
-let inputString = System.IO.File.ReadAllText("Day1.txt")
+let input = System.IO.File.ReadAllText("Day1.txt") |> Seq.map (fun x -> int x - int '0')
 
-let pairAreEqual (a, b) = a = b
+let offsetBy1AndZip sequence =
+  let offsetSequence = Seq.head sequence |> Seq.singleton |> Seq.append (Seq.tail sequence)
+  Seq.zip sequence offsetSequence
 
-let solve = 
-  let input = inputString |> Seq.map (fun x -> int x - int '0')
-  let offsetInput = Seq.head input |> Seq.singleton |> Seq.append (Seq.tail input)
-  let zippedInput = Seq.zip input offsetInput
-  zippedInput |> Seq.filter pairAreEqual |> Seq.sumBy (fun (a, _) -> a)
+let offsetByHalfAndZip sequence = 
+  let offsetAmount = Seq.length sequence / 2
+  let firstHalf = sequence |> Seq.take offsetAmount
+  let secondHalf = sequence |> Seq.skip offsetAmount
+  Seq.zip sequence (Seq.append secondHalf firstHalf)
+
+let sumOfEquals sequence: int =
+  sequence |> Seq.filter (fun (a, b) -> a = b) |> Seq.sumBy (fun (a, _) -> a)
+
+let solve (sequence: int seq) = 
+  printfn "Part 1: %i" (sequence |> offsetBy1AndZip |> sumOfEquals)
+  printfn "Part 2: %i" (sequence |> offsetByHalfAndZip |> sumOfEquals)

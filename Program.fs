@@ -1,13 +1,13 @@
 ﻿open System
 
-let matchDay day = 
+let solveDay day = 
   match day with
-    | "1" -> printfn "%A" Day1.solve
+    | "1" -> Day1.solve Day1.input
     | _ -> printfn "Input doesn't seem to match any days"
 
 
 [<EntryPoint>]
 let main argv =
-  matchDay argv.[0]
+  solveDay argv.[0]
   0 // return an integer exit code
  
