@@ -1,6 +1,8 @@
 module Day1
 
-let input = System.IO.File.ReadAllText("Day1.txt") |> Seq.map (fun x -> int x - int '0')
+open System.IO
+
+let input = File.ReadAllText("Day1.txt") |> Seq.map (fun x -> int x - int '0')
 
 let offsetBy1AndZip sequence =
   let offsetSequence = Seq.head sequence |> Seq.singleton |> Seq.append (Seq.tail sequence)
