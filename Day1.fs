@@ -5,8 +5,10 @@ open System.IO
 let input = File.ReadAllText("Day1.txt") |> Seq.map (fun x -> int x - int '0')
 
 let offsetBy1AndZip sequence =
-  let offsetSequence = Seq.head sequence |> Seq.singleton |> Seq.append (Seq.tail sequence)
-  Seq.zip sequence offsetSequence
+  Seq.head sequence 
+  |> Seq.singleton 
+  |> Seq.append (Seq.tail sequence)
+  |> Seq.zip sequence
 
 let offsetByHalfAndZip sequence = 
   let offsetAmount = Seq.length sequence / 2
@@ -15,7 +17,9 @@ let offsetByHalfAndZip sequence =
   Seq.zip sequence (Seq.append secondHalf firstHalf)
 
 let sumOfEquals sequence: int =
-  sequence |> Seq.filter (fun (a, b) -> a = b) |> Seq.sumBy (fun (a, _) -> a)
+  sequence 
+  |> Seq.filter (fun (a, b) -> a = b) 
+  |> Seq.sumBy (fun (a, _) -> a)
 
 let solve (sequence: int seq) = 
   printfn "Part 1: %i" (sequence |> offsetBy1AndZip |> sumOfEquals)
