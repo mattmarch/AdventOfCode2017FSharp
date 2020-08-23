@@ -66,5 +66,26 @@ let gridPositions = Seq.append (Seq.singleton {X = 0; Y = 0}) (Seq.unfold stateI
 
 let takeIndex index sequence = sequence |> Seq.take index |> Seq.last
 
+// Part 2
+
+let getSurroundingCells position =
+  let possibleCells = seq {-1; 0; 1}
+  Seq.allPairs possibleCells possibleCells 
+    |> Seq.filter (fun (x, y) -> not (x = 0 && y = 0))
+    |> Seq.map (fun (x, y) -> {X = position.X + x; Y = position.Y + y})
+
+let initialSumValues = Map.empty.Add({X = 0; Y = 0}, 1)
+
+let rec findGreaterThan threshold (sumValues: Map<Position, int>) currentState =
+  let nextState = getNextState currentState
+  let cellValue = getSurroundingCells nextState.Position
+                    |> Seq.choose (fun position -> Map.tryFind position sumValues)
+                    |> Seq.sum
+  match cellValue > threshold with
+    | true -> cellValue
+    | false -> findGreaterThan threshold (sumValues.Add(nextState.Position, cellValue)) nextState
+
+
 let solve (inputNumber: int) = 
   printfn "Part 1: %i" (takeIndex inputNumber gridPositions |> manhattanDistance)
+  printfn "Part 2: %i" (findGreaterThan inputNumber initialSumValues initialState)
