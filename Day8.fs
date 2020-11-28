@@ -81,17 +81,31 @@ let applyOperation registers register operation amount =
   | Increment -> registers.Add(register, currentRegisterValue + amount)
   | Decrement -> registers.Add(register, currentRegisterValue - amount)
 
-let applyInstruction registers instruction =
-  if evaluateCondition registers instruction.Condition then 
-    applyOperation registers instruction.Register instruction.Operation instruction.Amount
-  else registers
+type State = {
+  Registers: Registers;
+  CurrentMaximum: int;
+}
 
-let applyInstructions: Instruction seq -> Registers =
-  Seq.fold applyInstruction (Registers [])
+let applyInstruction state instruction =
+  if evaluateCondition state.Registers instruction.Condition then 
+    let nextRegistersState = applyOperation state.Registers instruction.Register instruction.Operation instruction.Amount
+    let newRegisterValue = getRegisterValue nextRegistersState instruction.Register
+    {
+      Registers = nextRegistersState;
+      CurrentMaximum = 
+        if newRegisterValue > state.CurrentMaximum then newRegisterValue else state.CurrentMaximum;
+    }
+  else state
+
+let applyInstructions: Instruction seq -> State =
+  Seq.fold applyInstruction ({Registers = Registers []; CurrentMaximum = 0})
 
 let solve instructions =
-  printfn "Part 1: %i" (applyInstructions instructions
+  let endState = applyInstructions instructions
+  printfn "Part 1: %i" (endState.Registers
     |> Map.toList 
     |> List.maxBy snd
     |> snd
-    )
+  )
+  printfn "Part 2: %i" endState.CurrentMaximum
+    
