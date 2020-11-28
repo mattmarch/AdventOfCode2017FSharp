@@ -9,6 +9,7 @@ let solveDay day =
     | "5" -> Day5.solve Day5.input
     | "6" -> Day6.solve Day6.input
     | "7" -> Day7.solve Day7.input
+    | "8" -> Day8.solve Day8.input
     | _ -> printfn "Input doesn't seem to match any days"
 
 
