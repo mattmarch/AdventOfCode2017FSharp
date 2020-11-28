@@ -52,5 +52,53 @@ let findBottomNode nodeList =
   |> List.map (fun node -> node.Name) 
   |> List.find (isNotContainedBy listOfHeldNodes)
 
+type Node = {
+  Name: Name;
+  Weight: int;
+  Holding: Node list;
+}
+
+let rec createNodeTree baseNode (parsedNodes: ParsedNode list) =
+  let node = parsedNodes |> List.find (fun n -> n.Name = baseNode)
+  {
+    Name = node.Name;
+    Weight = node.Weight;
+    Holding = node.Holding |> List.map (fun n -> createNodeTree n parsedNodes)
+  }
+
+type BalanceCheckResult =
+  | BalancedWeight of int
+  | Unbalanced of int list
+
+let getUnbalanced results =
+  let unbalancedInResults = results |> List.tryPick (fun r ->
+    match r with
+    | BalancedWeight _ -> None
+    | Unbalanced weights -> Some (Unbalanced weights)
+    )
+  match unbalancedInResults with
+  | Some unbalancedResult -> Some unbalancedResult
+  | None -> match (results |> List.distinct |> List.length > 1) with
+            | true -> Some (Unbalanced (results |> List.choose (fun r -> match r with
+                                                                          | BalancedWeight w -> Some w
+                                                                          | _ -> None
+                                                                          )))
+            | false -> None
+
+let sumBalancedWeights =
+  List.choose (fun r -> match r with
+                        | BalancedWeight w -> Some(w)
+                        | _ -> None
+  ) >> List.sum
+
+let rec checkBalance node =
+  let heldResults = node.Holding |> List.map checkBalance
+  match getUnbalanced heldResults with
+  | Some unbalanced -> unbalanced
+  | None -> BalancedWeight ((heldResults |> sumBalancedWeights) + node.Weight)
+
+
 let solve nodes =
-  printfn "Part 1: %s" (findBottomNode nodes)
+  let bottomNode = findBottomNode nodes
+  printfn "Part 1: %s" bottomNode
+  printfn "Part 2: %A" (nodes |> (createNodeTree bottomNode) |> checkBalance)
